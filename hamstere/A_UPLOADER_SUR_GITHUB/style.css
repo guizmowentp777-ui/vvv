@@ -1,0 +1,866 @@
+/* ========================================================
+   HAMSTER.IO - ROBOVSKI SLAP ARENA STYLESHEET
+   Mobile Landscape Optimized & Slither.io Aesthetics
+   ======================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0b0f19;
+  font-family: 'Fredoka', cursive, system-ui, sans-serif;
+  color: #fff;
+  touch-action: none;
+}
+
+#game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: #080c14;
+}
+
+#game-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ================= Glassmorphism UI ================= */
+.glass-card {
+  background: rgba(18, 25, 44, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+#ui-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Let touches fall through unless on interactive elements */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: env(safe-area-inset-top, 12px) env(safe-area-inset-right, 12px) env(safe-area-inset-bottom, 12px) env(safe-area-inset-left, 12px);
+  z-index: 10;
+}
+
+/* ================= Top Bar HUD ================= */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.stats-panel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+}
+
+.hamster-avatar-badge {
+  font-size: 26px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffcc00;
+}
+
+.stats-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.player-name-label {
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.health-bar-container {
+  position: relative;
+  width: 140px;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.health-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff416c, #ff4b2b, #2ecc71);
+  background-size: 200% 100%;
+  border-radius: 7px;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.health-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.score-panel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.score-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.score-icon {
+  font-size: 18px;
+}
+
+.score-val {
+  color: #ffda79;
+}
+
+.top-actions {
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.icon-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 12px;
+  width: 38px;
+  height: 38px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.icon-btn:hover, .icon-btn:active {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+/* ================= Leaderboard (Slither.io style) ================= */
+.leaderboard {
+  position: absolute;
+  top: 60px;
+  right: 12px;
+  width: 170px;
+  padding: 10px;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.leaderboard-title {
+  font-family: 'Bungee', cursive;
+  font-size: 11px;
+  color: #ffbe76;
+  text-align: center;
+  margin-bottom: 6px;
+  letter-spacing: 0.8px;
+}
+
+#leaderboard-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#leaderboard-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 11px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#leaderboard-list li.is-player {
+  background: rgba(255, 204, 0, 0.25);
+  border: 1px solid #ffcc00;
+  color: #ffeaa7;
+}
+
+#leaderboard-list .lb-rank {
+  opacity: 0.7;
+  margin-right: 4px;
+  font-size: 10px;
+}
+
+#leaderboard-list .lb-name {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#leaderboard-list .lb-score {
+  color: #55efc4;
+  margin-left: 6px;
+  font-weight: 700;
+}
+
+/* ================= Minimap ================= */
+.minimap-wrapper {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  padding: 4px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 220, 255, 0.3);
+  border: 2px solid rgba(0, 220, 255, 0.5);
+  pointer-events: none;
+}
+
+#minimap-canvas {
+  border-radius: 50%;
+  display: block;
+  background: radial-gradient(circle, #0e1628 0%, #060910 100%);
+}
+
+/* ================= Kill Feed ================= */
+.kill-feed {
+  position: absolute;
+  bottom: 12px;
+  left: 160px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 4px;
+  pointer-events: none;
+  max-height: 100px;
+  overflow: hidden;
+}
+
+.kill-feed-item {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  border-left: 3px solid #ff4757;
+  animation: feedFadeIn 0.3s ease-out;
+}
+
+@keyframes feedFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================= MOBILE CONTROLS (Landscape) ================= */
+/* Left Half: Virtual Joystick */
+#joystick-zone {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 50%;
+  height: 85%;
+  pointer-events: auto;
+  touch-action: none;
+  display: flex;
+  align-items: flex-end;
+  padding-left: 30px;
+  padding-bottom: 30px;
+}
+
+#joystick-base {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+#joystick-stick {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffd166, #e67e22);
+  border: 2px solid #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+  transform: translate(0px, 0px);
+  will-change: transform;
+}
+
+.joystick-hint {
+  position: absolute;
+  bottom: 8px;
+  left: 35px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  font-weight: 600;
+}
+
+/* Right Half: Slap Attack & Sprint Buttons */
+#action-zone {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  height: 85%;
+  pointer-events: auto;
+  touch-action: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-right: 30px;
+  padding-bottom: 30px;
+  gap: 20px;
+}
+
+.action-btn {
+  position: relative;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fredoka', cursive, sans-serif;
+  font-weight: 700;
+  color: #fff;
+  transition: transform 0.08s ease, filter 0.08s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.action-btn:active, .action-btn.active-touch {
+  transform: scale(0.92);
+  filter: brightness(1.2);
+}
+
+/* Baffe / Slap Paw Attack Button */
+.slap-btn {
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff6b6b, #ee5253, #c0392b);
+  border: 4px solid #fff;
+  box-shadow: 0 6px 25px rgba(238, 82, 83, 0.6), inset 0 3px 6px rgba(255, 255, 255, 0.4);
+  animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 6px 25px rgba(238, 82, 83, 0.5); }
+  50% { box-shadow: 0 6px 35px rgba(238, 82, 83, 0.85), 0 0 15px #ff7675; }
+}
+
+.slap-btn .btn-icon {
+  font-size: 38px;
+  transform: translateY(-2px);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+
+.slap-btn .btn-label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+
+/* Sprint Dash Button */
+.dash-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #48dbfb, #0abde3, #0984e3);
+  border: 3px solid #fff;
+  box-shadow: 0 4px 18px rgba(10, 189, 227, 0.5), inset 0 2px 5px rgba(255, 255, 255, 0.4);
+  margin-bottom: 12px;
+}
+
+.dash-btn .btn-icon {
+  font-size: 26px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+}
+
+.dash-btn .btn-label {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Cooldown overlay */
+.cooldown-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 50%;
+  display: none;
+}
+
+/* ================= MODALS & OVERLAYS ================= */
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(8, 12, 20, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.modal-backdrop.hidden {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.modal-box {
+  background: linear-gradient(145deg, #162035, #0d1424);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 24px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 204, 0, 0.15);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scrollbar-width: thin;
+}
+
+.game-title {
+  font-family: 'Bungee', cursive;
+  font-size: 28px;
+  color: #ffcc00;
+  text-shadow: 0 3px 0 #d35400, 0 6px 15px rgba(255, 165, 0, 0.5);
+  letter-spacing: 1px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #a4b0be;
+  margin-top: -8px;
+  font-weight: 600;
+}
+
+.hamster-preview-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(0, 0, 0, 0.25) 100%);
+  border-radius: 16px;
+  padding: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.breed-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffbe76;
+  background: rgba(255, 190, 118, 0.15);
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin-top: 6px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  text-align: left;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #dfe4ea;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: #fff;
+  font-family: 'Fredoka', cursive, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus {
+  border-color: #ffcc00;
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+}
+
+.color-options {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+}
+
+.color-opt {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.color-opt.active {
+  transform: scale(1.15);
+  border-color: #ffcc00;
+  box-shadow: 0 0 12px rgba(255, 204, 0, 0.6);
+}
+
+.play-btn {
+  background: linear-gradient(135deg, #ff9f43, #ff5252);
+  border: none;
+  border-radius: 14px;
+  padding: 13px 24px;
+  color: #fff;
+  font-family: 'Bungee', cursive;
+  font-size: 17px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+  transition: transform 0.12s ease, filter 0.12s ease;
+  margin-top: 6px;
+}
+
+.play-btn:active {
+  transform: scale(0.97);
+  filter: brightness(1.1);
+}
+
+.how-to-play {
+  text-align: left;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 11px;
+  color: #ced6e0;
+}
+
+.how-to-play h3 {
+  font-size: 12px;
+  margin-bottom: 4px;
+  color: #f1f2f6;
+}
+
+.how-to-play ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Game Over Styles */
+.gameover-title {
+  font-family: 'Bungee', cursive;
+  font-size: 32px;
+  color: #ff4757;
+  text-shadow: 0 3px 0 #b33939;
+}
+
+.gameover-desc {
+  font-size: 14px;
+  color: #ced6e0;
+}
+
+.gameover-stats {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 10px 0;
+}
+
+.go-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.go-stat-val {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffda79;
+}
+
+.go-stat-lbl {
+  font-size: 11px;
+  color: #a4b0be;
+}
+
+/* ================= PORTRAIT MODE WARNING ================= */
+#portrait-warning {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0b0f19;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.warning-card {
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.phone-rotate-icon {
+  font-size: 52px;
+  animation: rotatePhone 2s infinite ease-in-out;
+}
+
+@keyframes rotatePhone {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(90deg); }
+}
+
+.warning-card h2 {
+  font-family: 'Bungee', cursive;
+  font-size: 18px;
+  color: #ffcc00;
+}
+
+.warning-card p {
+  font-size: 13px;
+  color: #dfe4ea;
+  line-height: 1.4;
+}
+
+/* Automatically show warning on mobile devices held vertically */
+@media screen and (orientation: portrait) and (max-width: 899px) {
+  #portrait-warning {
+    display: flex;
+  }
+}
+
+/* ================= Online Status & Firebase Modal ================= */
+.status-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.status-dot.online {
+  background: #2ecc71;
+  box-shadow: 0 0 8px #2ecc71, 0 0 14px rgba(46, 204, 113, 0.7);
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+.status-dot.offline {
+  background: #f39c12;
+  box-shadow: 0 0 6px rgba(243, 156, 18, 0.5);
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25); opacity: 0.8; }
+}
+
+.online-status-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  width: 100%;
+}
+
+.mini-config-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mini-config-btn:hover, .mini-config-btn:active {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.04);
+}
+
+.online-badge-btn {
+  position: relative;
+}
+
+.online-badge-btn .status-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  margin: 0;
+  width: 8px;
+  height: 8px;
+}
+
+/* ================= PWA Installation Button ================= */
+.install-pwa-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 204, 0, 0.5);
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: #ffda79;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.install-pwa-btn:hover, .install-pwa-btn:active {
+  background: rgba(255, 204, 0, 0.18);
+  border-color: #ffcc00;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+}
+
+.install-pulse-btn {
+  background: rgba(255, 204, 0, 0.25) !important;
+  border-color: #ffcc00 !important;
+  animation: pulseInstall 2s infinite ease-in-out;
+}
+
+@keyframes pulseInstall {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 204, 0, 0.5); }
+  50% { box-shadow: 0 0 15px rgba(255, 204, 0, 0.9); }
+}
+
+/* Responsive tweaks for smaller landscape screens */
+@media screen and (max-height: 480px) {
+  .modal-box {
+    padding: 14px;
+    gap: 8px;
+  }
+  .hamster-preview-box {
+    padding: 4px;
+  }
+  #preview-canvas {
+    width: 110px;
+    height: 110px;
+  }
+  .game-title {
+    font-size: 20px;
+  }
+  .slap-btn {
+    width: 78px;
+    height: 78px;
+  }
+  .slap-btn .btn-icon {
+    font-size: 30px;
+  }
+  .dash-btn {
+    width: 60px;
+    height: 60px;
+  }
+  #joystick-base {
+    width: 100px;
+    height: 100px;
+  }
+  #joystick-stick {
+    width: 44px;
+    height: 44px;
+  }
+  .leaderboard {
+    width: 140px;
+    padding: 6px;
+    top: 50px;
+  }
+  .minimap-wrapper {
+    width: 90px;
+    height: 90px;
+  }
+  #minimap-canvas {
+    width: 82px;
+    height: 82px;
+  }
+}
+

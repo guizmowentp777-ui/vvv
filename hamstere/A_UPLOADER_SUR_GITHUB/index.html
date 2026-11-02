@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Hamster.io">
+  <meta name="theme-color" content="#0b0f19">
+  <title>Hamster.io - Roborovski Slap Arena</title>
+
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Bungee&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <div id="game-container">
+    <!-- Main Render Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- UI Overlay -->
+    <div id="ui-overlay">
+      <!-- Top Header Bar -->
+      <div class="top-bar">
+        <!-- Player Stats -->
+        <div class="stats-panel glass-card">
+          <div class="hamster-avatar-badge">🐹</div>
+          <div class="stats-text">
+            <div class="player-name-label" id="hud-player-name">Robo-Champion</div>
+            <div class="health-bar-container">
+              <div class="health-bar-fill" id="hud-health-fill" style="width: 100%;"></div>
+              <span class="health-text" id="hud-health-text">100 / 100 HP</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Score & Sunflower Seeds Counter -->
+        <div class="score-panel glass-card">
+          <div class="score-item">
+            <span class="score-icon">🌻</span>
+            <span class="score-val" id="hud-seeds">0</span>
+          </div>
+          <div class="score-item">
+            <span class="score-icon">🥊</span>
+            <span class="score-val" id="hud-kos">0 KO</span>
+          </div>
+        </div>
+
+        <!-- Quick Action Buttons (Install, Online status, Sound, Fullscreen, Help) -->
+        <div class="top-actions">
+          <button id="btn-install-hud" class="icon-btn install-pulse-btn"
+            title="Installer l'application sur votre appareil" style="display: none;">📲</button>
+          <button id="btn-online-hud" class="icon-btn online-badge-btn" title="Multijoueur Firebase (En Ligne)">
+            🌐 <span id="online-status-dot" class="status-dot offline"></span>
+          </button>
+          <button id="btn-sound" class="icon-btn" title="Son Activer/Désactiver">🔊</button>
+          <button id="btn-fullscreen" class="icon-btn" title="Plein écran">⛶</button>
+          <button id="btn-help" class="icon-btn" title="Aide">❓</button>
+        </div>
+      </div>
+
+      <!-- Slither.io Style Leaderboard (Top Right) -->
+      <div class="leaderboard glass-card" id="leaderboard">
+        <div class="leaderboard-title">CLASSEMENT 🏆</div>
+        <ol id="leaderboard-list">
+          <!-- Populated by JS -->
+        </ol>
+      </div>
+
+      <!-- Slither.io Style Minimap (Bottom Right) -->
+      <div class="minimap-wrapper glass-card">
+        <canvas id="minimap-canvas" width="130" height="130"></canvas>
+      </div>
+
+      <!-- Feed / Kill Log (Bottom Left) -->
+      <div class="kill-feed" id="kill-feed"></div>
+
+      <!-- MOBILE CONTROLS OVERLAY (Landscape) -->
+      <!-- Left Screen Zone: Virtual Joystick for Movement -->
+      <div id="joystick-zone">
+        <div id="joystick-base">
+          <div id="joystick-stick"></div>
+        </div>
+        <div class="joystick-hint">Glisser pour diriger 🐾</div>
+      </div>
+
+      <!-- Right Screen Zone: Action Buttons (Slap Attack & Sprint) -->
+      <div id="action-zone">
+        <!-- Dash/Sprint Button -->
+        <button id="btn-dash" class="action-btn dash-btn">
+          <span class="btn-icon">⚡</span>
+          <span class="btn-label">SPRINT</span>
+          <div class="stamina-ring" id="stamina-ring"></div>
+        </button>
+
+        <!-- Crazy Paw Slap Attack Button -->
+        <button id="btn-slap" class="action-btn slap-btn">
+          <span class="btn-icon">🐾</span>
+          <span class="btn-label">BAFFE !</span>
+          <div class="cooldown-overlay" id="slap-cooldown"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Portrait Mode Warning for Mobile -->
+    <div id="portrait-warning">
+      <div class="warning-card">
+        <div class="phone-rotate-icon">📱 ➔ 📲</div>
+        <h2>Veuillez tourner votre appareil</h2>
+        <p>Le jeu se joue en <strong>mode paysage</strong> pour une meilleure expérience de combat de hamsters !</p>
+        <button id="btn-dismiss-portrait" class="mini-config-btn"
+          onclick="document.getElementById('portrait-warning').style.display='none';"
+          style="margin-top: 12px; padding: 10px 20px; font-size: 13px; font-weight: 700; cursor: pointer;">Jouer en
+          mode portrait quand même ➔</button>
+      </div>
+    </div>
+
+    <!-- Start / Respawn Modal -->
+    <div id="start-modal" class="modal-backdrop">
+      <div class="modal-box">
+        <h1 class="game-title">🐹 HAMSTER.IO</h1>
+        <p class="subtitle">Arène Roborovski Multijoueur</p>
+
+        <!-- Online Multiplayer Status Card -->
+        <div class="online-status-card" id="start-online-card">
+          <div id="start-online-badge">
+            <span class="status-dot offline"></span>
+            <span id="online-status-text">Mode Local (2 Bots)</span>
+          </div>
+          <button id="btn-open-firebase" class="mini-config-btn" type="button">⚙️ Configurer Firebase</button>
+        </div>
+
+        <div class="hamster-preview-box">
+          <canvas id="preview-canvas" width="180" height="180"></canvas>
+          <div class="breed-badge">Hamster Roborovski Nain</div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-nickname">Nom de ton Hamster :</label>
+          <input type="text" id="input-nickname" maxlength="14" value="Robo-Guerrier" spellcheck="false"
+            autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label>Couleur du Pelage :</label>
+          <div class="color-options" id="color-options">
+            <button class="color-opt active" data-color="#d49b5b" title="Agouti Naturel"
+              style="background: #d49b5b;"></button>
+            <button class="color-opt" data-color="#e8c89b" title="Sable Roborovski"
+              style="background: #e8c89b;"></button>
+            <button class="color-opt" data-color="#f5efe6" title="Robo Blanc Pur" style="background: #f5efe6;"></button>
+            <button class="color-opt" data-color="#8c6a48" title="Chocolat Agouti"
+              style="background: #8c6a48;"></button>
+            <button class="color-opt" data-color="#e58e3c" title="Fauve Doré" style="background: #e58e3c;"></button>
+            <button class="color-opt" data-color="#7a7f8a" title="Gris Perle" style="background: #7a7f8a;"></button>
+          </div>
+        </div>
+
+        <button id="btn-play" class="play-btn"
+          onclick="if(window.gameEngine){window.gameEngine.startGame();}else{var m=document.getElementById('start-modal');if(m)m.style.setProperty('display','none','important');}">ENTRER
+          DANS L'ARÈNE 🚀</button>
+
+        <!-- Install App Button (PWA) -->
+        <button id="btn-install-app" class="install-pwa-btn" type="button">
+          <span>📲</span> <strong>Installer l'application</strong>
+        </button>
+
+        <div class="how-to-play">
+          <h3>🎮 Commandes :</h3>
+          <ul>
+            <li><strong>Gauche :</strong> Joystick tactile (ou ZQSD / Flèches / Souris) pour avancer avec les petites
+              pattes arrière !</li>
+            <li><strong>Droite :</strong> Bouton <strong>BAFFE 🐾</strong> (ou Espace / Clic Gauche) pour donner un coup
+              de patte bizarre et hilarant !</li>
+            <li><strong>Sprint ⚡ :</strong> Bouton Sprint (ou Shift) pour courir plus vite.</li>
+            <li><strong>But :</strong> Manger des graines 🌻 pour grandir et baffer les hamsters rivaux pour marquer des
+              points !</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- iOS Install Guide Modal -->
+    <div id="ios-install-modal" class="modal-backdrop hidden">
+      <div class="modal-box" style="max-width: 380px;">
+        <h2 class="game-title" style="font-size: 20px;">📲 Installer sur iPhone / iPad</h2>
+        <div
+          style="font-size: 13px; line-height: 1.6; text-align: left; background: rgba(0,0,0,0.3); padding: 14px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <p>1. Touchez le bouton <strong>Partager</strong> <span style="font-size: 16px;">⎋</span> en bas dans Safari.
+          </p>
+          <p>2. Faites défiler vers le bas et touchez <strong>"Sur l'écran d'accueil"</strong> <span
+              style="font-size: 16px;">➕</span>.</p>
+          <p>3. Touchez <strong>Ajouter</strong> en haut à droite !</p>
+        </div>
+        <button id="btn-close-ios-modal" class="play-btn" style="padding: 10px 20px; font-size: 14px;">Compris !
+          👍</button>
+      </div>
+    </div>
+
+    <!-- Firebase Configuration Modal -->
+    <div id="firebase-modal" class="modal-backdrop hidden">
+      <div class="modal-box" style="max-width: 440px;">
+        <h2 class="game-title" style="font-size: 20px;">🔥 MULTIJOUEUR FIREBASE</h2>
+        <p class="subtitle">Collez la configuration de votre base de données Firebase pour jouer en ligne avec d'autres
+          joueurs :</p>
+
+        <div class="form-group" style="width: 100%;">
+          <label for="fb-config-input">Configuration Firebase (JSON ou JavaScript) :</label>
+          <textarea id="fb-config-input" rows="7"
+            style="width: 100%; font-family: monospace; font-size: 11px; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #55efc4; resize: vertical;"
+            placeholder='{
+  "apiKey": "AIzaSy...",
+  "authDomain": "votre-projet.firebaseapp.com",
+  "databaseURL": "https://votre-projet-default-rtdb.firebaseio.com",
+  "projectId": "votre-projet"
+}' spellcheck="false"></textarea>
+        </div>
+
+        <div id="fb-status-feedback" style="font-size: 12px; font-weight: 600; min-height: 18px;"></div>
+
+        <div style="display: flex; gap: 10px; justify-content: center; width: 100%;">
+          <button id="btn-save-fb" class="play-btn" style="flex: 1; padding: 10px; font-size: 14px;">SAUVEGARDER &
+            CONNECTER 🚀</button>
+          <button id="btn-close-fb" class="icon-btn"
+            style="width: 70px; height: auto; border-radius: 14px; font-size: 13px; font-weight: 700;">FERMER</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over / Respawn Screen -->
+    <div id="gameover-modal" class="modal-backdrop hidden">
+      <div class="modal-box">
+        <h2 class="gameover-title">K.O. ! 😵</h2>
+        <p class="gameover-desc" id="ko-killer-text">Tu as été assommé par une baffe mémorable !</p>
+        <div class="gameover-stats">
+          <div class="go-stat">
+            <span class="go-stat-val" id="go-score">0</span>
+            <span class="go-stat-lbl">Graines 🌻</span>
+          </div>
+          <div class="go-stat">
+            <span class="go-stat-val" id="go-kos">0</span>
+            <span class="go-stat-lbl">K.O. Infligés 🥊</span>
+          </div>
+        </div>
+        <button id="btn-respawn" class="play-btn"
+          onclick="if(window.gameEngine){window.gameEngine.respawnPlayer();}else{var m=document.getElementById('gameover-modal');if(m)m.style.setProperty('display','none','important');}">REVENIR
+          AU COMBAT 🔄</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase Realtime Database SDK (Compat v9) - onerror makes offline mode work too -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"
+    onerror="window._firebaseFailed=true;console.warn('Firebase SDK non disponible (mode hors-ligne).');"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js" onerror=""></script>
+  <script>
+    // Sécurité : si Firebase n'a pas pu se charger (pas de réseau, etc.)
+    // on définit un stub vide pour éviter les erreurs ReferenceError
+    if (typeof firebase === 'undefined') {
+      window.firebase = undefined;
+    }
+  </script>
+
+  <!-- Game Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/food.js"></script>
+  <script src="js/hamster.js"></script>
+  <script src="js/bot.js"></script>
+  <script src="js/multiplayer.js"></script>
+  <script src="js/controls.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/pwa.js"></script>
+</body>
+
+</html>
